@@ -54,10 +54,6 @@ CREATE TABLE property_reviews (
 
 
 
-
-
-
-
 -- DROP TABLE IF EXISTS users CASCADE;
 
 -- DROP TABLE IF EXISTS rates CASCADE;
