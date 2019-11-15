@@ -1,18 +1,6 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
-
-const {
-  Pool
-} = require('pg');
-
-const pool = new Pool({
-  user: 'vagrant',
-  password: '123',
-  host: 'localhost',
-  database: 'lightbnb'
-});
-
-/// Users
+const db = require('./db/index.js');
 
 /**
  * Get a single user from the database given their email.
@@ -21,25 +9,13 @@ const pool = new Pool({
  */
 const getUserWithEmail = function (email) {
 
-  return pool.query(`
+  return db.query(`
   SELECT * FROM users
   WHERE email= $1
-  `, [email])
-    .then(res =>
+  `, [email]).then(res =>
       res ? res.rows[0] : null);
 }
 
-// let user;
-// for (const userId in users) {
-//   user = users[userId];
-//   if (user.email.toLowerCase() === email.toLowerCase()) {
-//     break;
-//   } else {
-//     user = null;
-//   }
-
-// return Promise.resolve(user);
-// }
 exports.getUserWithEmail = getUserWithEmail;
 
 /**
@@ -48,7 +24,7 @@ exports.getUserWithEmail = getUserWithEmail;
  * @return {Promise<{}>} A promise to the user.
  */
 const getUserWithId = function (id) {
-  return pool.query(`
+  return db.query(`
   SELECT * FROM users
   WHERE id = $1
   `, [id])
@@ -66,7 +42,7 @@ exports.getUserWithId = getUserWithId;
  * @return {Promise<{}>} A promise to the user.
  */
 const addUser = function (user) {
-  return pool.query(`
+  return db.query(`
   INSERT INTO users (name, email, password)
   VALUES ($1,$2,$3)
   RETURNING *;
@@ -90,7 +66,7 @@ exports.addUser = addUser;
  */
 const getAllReservations = function (guest_id, limit = 10) {
 
-  return pool.query(`
+  return db.query(`
   SELECT
   properties.*,
   reservations.*,
@@ -178,7 +154,7 @@ const getAllProperties = function (options, limit = 10) {
   //console.log(queryString, queryParams);
 
   // 6
-  return pool.query(queryString, queryParams)
+  return db.query(queryString, queryParams)
     .then(res => res.rows);
 }
 
@@ -198,8 +174,8 @@ const addProperty = function (property) {
   let queryString = `INSERT INTO properties (owner_id,title,description, thumbnail_photo_url, cover_photo_url,cost_per_night,parking_spaces, number_of_bathrooms,number_of_bedrooms,country,street, city, province,post_code ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
   RETURNING *;`
 
-  
-  return pool.query(queryString, queryParams)
+
+  return db.query(queryString, queryParams)
     .then(res => console.log(res.rows));
 }
 exports.addProperty = addProperty;
